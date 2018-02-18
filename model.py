@@ -82,6 +82,8 @@ class BiRNN(object):
             self.alpha = tf.nn.softmax(attn_zconcat)
             # transform to sequence_length * batch_size * 1 , same rank as outputs
             alpha_trans = tf.reshape(tf.transpose(self.alpha, [1, 0]), [sequence_length, -1, 1])
+
+            zz = outputs * alpha_trans
             self.final_output = tf.reduce_sum(outputs * alpha_trans, 0)
 
         print self.final_output.shape
