@@ -1,11 +1,12 @@
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 
 import tensorflow as tf
 from utils import InputHelper
 from model import BiRNN
 
-tf.flags.DEFINE_integer('rnn_size', 100, 'hidden units of RNN , as well as dimensionality of character embedding (default: 100)')
+tf.flags.DEFINE_integer('rnn_size', 100,
+                        'hidden units of RNN , as well as dimensionality of character embedding (default: 100)')
 tf.flags.DEFINE_float('dropout_keep_prob', 0.5, 'Dropout keep probability (default : 0.5)')
 tf.flags.DEFINE_integer('layer_size', 2, 'number of layers of RNN (default: 2)')
 tf.flags.DEFINE_integer('batch_size', 128, 'Batch Size (default : 32)')
@@ -24,27 +25,28 @@ FLAGS._parse_flags()
 
 
 def main():
-	data_loader = InputHelper()
-	data_loader.create_dictionary(FLAGS.data_dir+'/'+FLAGS.train_file, FLAGS.data_dir+'/')
-	FLAGS.vocab_size = data_loader.vocab_size
-	FLAGS.n_classes = data_loader.n_classes
+    data_loader = InputHelper()
+    data_loader.create_dictionary(FLAGS.data_dir + '/' + FLAGS.train_file, FLAGS.data_dir + '/')
+    FLAGS.vocab_size = data_loader.vocab_size
+    FLAGS.n_classes = data_loader.n_classes
 
-	model = BiRNN(FLAGS.rnn_size, FLAGS.layer_size, FLAGS.vocab_size, 
-		FLAGS.batch_size, FLAGS.sequence_length, FLAGS.n_classes, FLAGS.grad_clip)
+    model = BiRNN(FLAGS.rnn_size, FLAGS.layer_size, FLAGS.vocab_size,
+                  FLAGS.batch_size, FLAGS.sequence_length, FLAGS.n_classes, FLAGS.grad_clip)
 
-	with tf.Session() as sess:
-		sess.run(tf.global_variables_initializer())
-		saver = tf.train.Saver(tf.global_variables())
-		ckpt = tf.train.get_checkpoint_state(FLAGS.save_dir)
-		if ckpt and ckpt.model_checkpoint_path:
-			saver.restore(sess, ckpt.model_checkpoint_path)
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+        saver = tf.train.Saver(tf.global_variables())
+        ckpt = tf.train.get_checkpoint_state(FLAGS.save_dir)
+        if ckpt and ckpt.model_checkpoint_path:
+            saver.restore(sess, ckpt.model_checkpoint_path)
 
-		while True:
-			x = raw_input('请输入一个地址:\n')
-			x = [data_loader.transform_raw(x, FLAGS.sequence_length)]
+        while True:
+            x = raw_input('请输入一个地址:\n')
+            x = [data_loader.transform_raw(x, FLAGS.sequence_length)]
 
-			labels = model.inference(sess, data_loader.labels, x)
-			print labels
+            labels = model.inference(sess, data_loader.labels, x)
+            print labels
+
 
 if __name__ == '__main__':
-	main()
+    main()
